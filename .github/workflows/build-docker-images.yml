@@ -33,7 +33,7 @@ jobs:
   build-scan-push:
     name: Build, Scan & Push Docker Image
     runs-on: ubuntu-latest
-    if: contains('refs/tags/v refs/heads/staging', github.ref)
+    if: contains(github.ref, 'release') || github.ref == 'refs/heads/staging'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
