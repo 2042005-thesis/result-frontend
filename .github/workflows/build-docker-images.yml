@@ -125,6 +125,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update docker-compose with image: $IMAGE_NAME"
+            git commit -m "Update docker-compose with image: $IMAGE_TAG"
             git push
           fi
