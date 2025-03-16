@@ -122,14 +122,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          fetch-depth: 0  # Ensure full history is available
       - run: |
           # Determine the correct docker-compose file to update
-          if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
-          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+          elif [[ "${{ github.ref }} == "refs/tags/v*" ]]; then
             COMPOSE_FILE="env/production/docker-compose.yml"
-            git checkout origin "main"
           else
             echo "Branch not recognized, skipping update."
             exit 0
