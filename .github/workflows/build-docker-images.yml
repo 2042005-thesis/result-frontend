@@ -124,9 +124,9 @@ jobs:
           ref: ${{ github.head_ref }}
       - run: |
           # Determine the correct docker-compose file to update
-          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+          if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
-          elif [[ "${{ github.ref }} == "refs/tags/v*" ]]; then
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             COMPOSE_FILE="env/production/docker-compose.yml"
           else
             echo "Branch not recognized, skipping update."
