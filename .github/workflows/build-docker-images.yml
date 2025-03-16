@@ -46,7 +46,7 @@ jobs:
             taufiq14s/voting-apps-result-frontend
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=raw,value=latest,enable={{eq .Branch "staging"}}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'staging') }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,format=short
