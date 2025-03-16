@@ -139,6 +139,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
       - run: |
+          IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Stage changes
@@ -148,6 +149,6 @@ jobs:
             echo "No changes to commit, skipping push."
             exit 0  # Exit gracefully instead of failing
           else
-            git commit -m "Update ${COMPOSE_FILE} with image tag ${{ needs.metadata.outputs.tags }}"
+            git commit -m "Update image tag $IMAGE_TAG"
             git push
           fi
