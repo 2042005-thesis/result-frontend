@@ -100,7 +100,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Generate Docker Metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: taufiq14s/voting-apps-result-frontend
+          tags: |
+            type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
+            type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
+            
       - name: Update docker-compose.yml
         run: |
           IMAGE_TAG="${{ needs.metadata.outputs.tags }}"
