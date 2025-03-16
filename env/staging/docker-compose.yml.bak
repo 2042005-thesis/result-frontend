@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  result:
+    image: taufiq14s/voting-apps-result-frontend:{TAG:-latest}
+    ports:
+      - "8082:80"
+    networks:
+      - voteapps-staging-backend
+      - voteapps-staging-frontend
+      - caddy-proxy
+networks:
+  caddy-proxy:
+  voteapps-staging-backend:
+  voteapps-staging-frontend:
