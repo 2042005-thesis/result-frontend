@@ -42,7 +42,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            docker.io/taufiq14s/voting-apps-result-frontend
+            taufiq14s/voting-apps-result-frontend
           # generate Docker tags based on the following events/attributes
           tags: |
             type=semver,pattern={{version}}
