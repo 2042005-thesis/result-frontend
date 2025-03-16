@@ -116,7 +116,7 @@ jobs:
 
       - name: Update docker-compose.yml
         run: |
-          IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
+          echo "IMAGE_TAG=${{ steps.metadata.outputs.tags }}" >> $GITHUB_ENV
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
@@ -141,7 +141,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
       - run: |
-          IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
+          echo "IMAGE_TAG=${{ steps.metadata.outputs.tags }}" >> $GITHUB_ENV
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Stage changes
