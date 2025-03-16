@@ -127,11 +127,9 @@ jobs:
           # Determine the correct docker-compose file to update
           if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
-            BRANCH="staging"
           elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             COMPOSE_FILE="env/production/docker-compose.yml"
-            BRANCH="main"  # Change this to the correct target branch
-            git checkout -B "$BRANCH"  # Create & switch to a branch
+            git checkout origin "main"
           else
             echo "Branch not recognized, skipping update."
             exit 0
@@ -154,5 +152,5 @@ jobs:
             exit 0  # Exit gracefully instead of failing
           else
             git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
-            git push origin "$BRANCH"
+            git push origin "main"
           fi
