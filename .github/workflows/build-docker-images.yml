@@ -71,7 +71,6 @@ jobs:
           load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          no-cache: true
 
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
@@ -83,7 +82,6 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           exit-code: 1
-          cache: 'false'
 
       - name: Push docker
         uses: docker/build-push-action@v6
