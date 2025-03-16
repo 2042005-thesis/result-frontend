@@ -143,7 +143,7 @@ jobs:
           # Update docker image tag
           echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
           # Replace any existing tag in the docker-compose file
-          sed -E -i "s|image: \".*\"|image: \"$DOCKER_METADATA_OUTPUT_TAGS\"|" $COMPOSE_FILE
+          sed -E -i "s|^\s*image:.*|image: $DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
           # Stage changes
           git add $COMPOSE_FILE
           # Check if there are changes before committing
