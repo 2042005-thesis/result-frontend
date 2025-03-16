@@ -106,6 +106,7 @@ jobs:
           IMAGE_TAG="${{ needs.metadata.outputs.tags }}"
           IMAGE_NAME="${{ needs.metadata.outputs.images }}"
 
+          # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
@@ -115,15 +116,22 @@ jobs:
             exit 0
           fi
 
-          echo "Updating $COMPOSE_FILE with image: $IMAGE_NAME"
-          sed -E -i'' "s/(.*$IMAGE_NAME:).*/\1$IMAGE_TAG/" '$COMPOSE_FILE' 
+          # Ensure file exists
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "Error: $COMPOSE_FILE does not exist!"
+            exit 1
+          fi
+
+          echo "Updating $COMPOSE_FILE with image: $IMAGE_NAME:$IMAGE_TAG"
+
+          # Replace any existing tag in the docker-compose file
+          sed -i -E "s|(${IMAGE_NAME}:)[^ ]+|\1$IMAGE_TAG|g" "$COMPOSE_FILE"
 
       - name: Commit and Push Changes
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
       - run: |
-          # Note: the following account information will not work on GHES
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           git add .
