@@ -116,7 +116,6 @@ jobs:
 
       - name: Update docker-compose.yml
         run: |
-          echo "IMAGE_TAG=${{ steps.metadata.outputs.tags }}" >> $GITHUB_ENV
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
@@ -134,14 +133,13 @@ jobs:
           fi
           echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
           # Replace any existing tag in the docker-compose file
-          sed -E -i.bak "s|image: \".*\"|image: \"$IMAGE_TAG\"|" "$COMPOSE_FILE"
+          sed -E -i.bak "s|image: \".*\"|image: \"$DOCKER_METADATA_OUTPUT_TAGS\"|" "$COMPOSE_FILE"
 
       - name: Commit and Push Changes
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
       - run: |
-          echo "IMAGE_TAG=${{ steps.metadata.outputs.tags }}" >> $GITHUB_ENV
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Stage changes
@@ -151,6 +149,6 @@ jobs:
             echo "No changes to commit, skipping push."
             exit 0  # Exit gracefully instead of failing
           else
-            git commit -m "Update image tag $IMAGE_TAG"
+            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_TAGS"
             git push
           fi
