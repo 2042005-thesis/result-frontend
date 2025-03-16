@@ -94,6 +94,9 @@ jobs:
           load: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+      - run: |
+          docker image tag ${{ steps.metadata.outputs.tags }} "${{ vars.DOCKER_REPO_NAME }}:latest"
+          docker image push "${{ vars.DOCKER_REPO_NAME }}:latest"
 
   update-docker-compose:
     name: Update Docker Compose Files
