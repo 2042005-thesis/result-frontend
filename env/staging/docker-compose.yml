@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   result:
-    image: taufiq14s/voting-apps-result-frontend:sha-256808e
+    image: taufiq14s/voting-apps-result-frontend:sha-e89030f
     ports:
       - "8082:80"
     networks:
