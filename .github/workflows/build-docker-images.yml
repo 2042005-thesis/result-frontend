@@ -1,3 +1,6 @@
+# Maintainers: taufiqpsumarna@gmail.com
+# Date: 2025-03-16
+
 name: Build and Push Docker Image
 
 on:
@@ -10,7 +13,6 @@ on:
       - "v*.*.*"
   pull_request:
   
-
 jobs:
   trivy-scan-fs:
     name: Scan Repository for Vulnerabilities
@@ -77,7 +79,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: ${{ steps.metadata.outputs.tags }}
+          image-ref: $(echo "${{ steps.metadata.outputs.tags }}" | cut -d ',' -f1)
           format: 'table'
           ignore-unfixed: true
           vuln-type: 'os,library'
@@ -128,4 +130,3 @@ jobs:
             git commit -m "Update $COMPOSE_FILE with image: ${IMAGE_NAME}:${IMAGE_TAG}"
             git push
           fi
-      
