@@ -39,17 +39,17 @@ jobs:
 
       - name: Docker metadatadata 
         id: metadata
-        uses: docker/metadatadata-action@v5
+        uses: docker/metadata-action@v5
         with:
           # list of Docker images to use as base name for tags
           images: |
             taufiq14s/voting-apps-result-frontend
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/staging' }}
             type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
             type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
             type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/staging' }}
             
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -92,4 +92,40 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
 
-      - name: Update doker-compose.yml
+      - name: Update docker-compose.yml files
+        run: |
+          # Extract image name and tag
+          IMAGE_NAME="${{ steps.metadata.outputs.images }}"
+          IMAGE_TAG=$(echo "${{ steps.metadata.outputs.tags }}" | cut -d ',' -f1)
+      
+          # Determine the correct docker-compose file to update
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            COMPOSE_FILE="env/staging/docker-compose.yml"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            COMPOSE_FILE="env/production/docker-compose.yml"
+          else
+            echo "Branch not recognized, skipping update."
+            exit 0
+          fi
+      
+          # Replace any existing tag in the docker-compose file
+          sed -i -E "s|(${IMAGE_NAME}:)[^ ]+|\1${IMAGE_TAG}|g" $COMPOSE_FILE
+      
+          echo "Updated $COMPOSE_FILE with image: ${IMAGE_NAME}:${IMAGE_TAG}"
+      
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+      
+          # Add the updated file
+          git add $COMPOSE_FILE
+      
+          # Check if there are changes before committing
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update $COMPOSE_FILE with image: ${IMAGE_NAME}:${IMAGE_TAG}"
+            git push
+          fi
+      
