@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - staging
+      - dev*
     tags:
       - "v*.*.*"
   pull_request:
@@ -31,7 +32,7 @@ jobs:
   build-scan-push:
     name: Build, Scan & Push Docker Image
     runs-on: ubuntu-latest
-    if: 
+    if: contains('refs/heads/main refs/heads/staging', github.ref)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
