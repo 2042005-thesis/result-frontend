@@ -116,12 +116,12 @@ jobs:
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
-            IMAGE_NAME= ${{ needs.metadata.outputs.images }}
-            IMAGE_TAG= ${{ needs.metadata.outputs.tags }}
+            IMAGE_NAME= ${{ steps.metadata.outputs.images }}
+            IMAGE_TAG= ${{ steps.metadata.outputs.tags }}
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             COMPOSE_FILE="env/production/docker-compose.yml"
-            IMAGE_NAME= ${{ needs.metadata.outputs.images }}
-            IMAGE_TAG= ${{ needs.metadata.outputs.tags }}
+            IMAGE_NAME= ${{ steps.metadata.outputs.images }}
+            IMAGE_TAG= ${{ steps.metadata.outputs.tags }}
           else
             echo "Branch not recognized, skipping update."
             exit 0
