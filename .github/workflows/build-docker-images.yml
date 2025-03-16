@@ -1,3 +1,7 @@
+# Maintainers: taufiqpsumarna@gmail.com
+# Version: 1.0
+# Date: 2025-03-16
+
 name: Build and Push Docker Image
 
 on:
@@ -9,7 +13,6 @@ on:
     tags:
       - "v*.*.*"
   pull_request:
-  
 
 jobs:
   trivy-scan-fs:
@@ -34,21 +37,19 @@ jobs:
     runs-on: ubuntu-latest
     if: contains('refs/heads/main refs/heads/staging', github.ref)
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Docker metadata 
-        id: meta
+      - name: Generate Docker Metadata
+        id: metadata
         uses: docker/metadata-action@v5
         with:
-          # list of Docker images to use as base name for tags
           images: |
-            taufiq14s/voting-apps-result-frontend
-          # generate Docker tags based on the following events/attributes
+            ${{ vars.DOCKER_REPO_NAME }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,format=short
+            type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
+            type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -64,30 +65,92 @@ jobs:
         with:
           call: check
 
-      - name: Build docker
+      - name: Build docker without push to registry
         uses: docker/build-push-action@v6
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
 
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: ${{ steps.meta.outputs.tags }}
+          image-ref: '${{ steps.metadata.outputs.tags }}'
           format: 'table'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
           exit-code: 1
-          cache: 'false'
 
-      - name: Push docker
+      - name: Push docker images to registry
         uses: docker/build-push-action@v6
+        env:
+            DOCKER_BUILD_SUMMARY: false
         with:
           push: true
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+
+  update-docker-compose:
+    name: Update Docker Compose Files
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: build-scan-push
+    if: contains('refs/heads/main refs/heads/staging', github.ref)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Generate Docker Metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: taufiq14s/voting-apps-result-frontend
+          tags: |
+            type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
+            type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Update docker-compose.yml, Commit and Push Changes
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: |
+          # Determine the correct docker-compose file to update
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            COMPOSE_FILE="env/staging/docker-compose.yml"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            COMPOSE_FILE="env/production/docker-compose.yml"
+          else
+            echo "Branch not recognized, skipping update."
+            exit 0
+          fi
+
+          # Ensure file exists
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "Error: $COMPOSE_FILE does not exist!"
+            exit 1
+          fi
+          # Config git credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "{user.id}+{user.login}@users.noreply.github.com"
+          # Update docker image tag
+          echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
+          # Replace any existing tag in the docker-compose file
+          sed -E -i "s|(image:\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
+          # Stage changes
+          git add $COMPOSE_FILE
+          # Check if there are changes before committing
+          if git diff --cached --quiet; then
+            echo "No changes to commit, skipping push."
+            exit 0  # Exit gracefully instead of failing
+          else
+            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
+            git push
+          fi
