@@ -27,6 +27,7 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           severity: 'CRITICAL,HIGH'
+          exit-code: 1
 
   build-scan-push:
     name: Build, Scan & Push Docker Image
@@ -81,10 +82,10 @@ jobs:
           scan-type: 'image'
           image-ref: ${{ steps.meta.outputs.tags }}
           format: 'table'
-          exit-code: 1
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          exit-code: 1
 
       - name: Push docker
         uses: docker/build-push-action@v6
