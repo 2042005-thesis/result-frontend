@@ -116,8 +116,12 @@ jobs:
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
+            IMAGE_NAME= ${{ needs.metadata.outputs.images }}
+            IMAGE_TAG= ${{ needs.metadata.outputs.tags }}
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             COMPOSE_FILE="env/production/docker-compose.yml"
+            IMAGE_NAME= ${{ needs.metadata.outputs.images }}
+            IMAGE_TAG= ${{ needs.metadata.outputs.tags }}
           else
             echo "Branch not recognized, skipping update."
             exit 0
@@ -129,10 +133,10 @@ jobs:
             exit 1
           fi
 
-          echo "Updating $COMPOSE_FILE with image: ${{ needs.metadata.outputs.images }}:${{ needs.metadata.outputs.tags }}"
+          echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
 
           # Replace any existing tag in the docker-compose file
-          sed -i -E "s|(${{ needs.metadata.outputs.images }}:)[^ ]+|\1${{ needs.metadata.outputs.tags }}|g" "$COMPOSE_FILE"
+          sed -i -E "s|(${IMAGE_NAME}:)[^ ]+|\1${IMAGE_TAG}|g" "$COMPOSE_FILE"
 
       - name: Commit and Push Changes
         uses: actions/checkout@v4
