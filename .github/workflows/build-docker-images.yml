@@ -116,7 +116,7 @@ jobs:
           fi
 
           echo "Updating $COMPOSE_FILE with image: $IMAGE_NAME"
-          sed -i -E "s|($IMAGE_NAME:)[^ ]+|\1$IMAGE_TAG|g" "$COMPOSE_FILE"
+          sed -E -i'' "s/(.*$IMAGE_NAME:).*/\1$IMAGE_TAG/" '$COMPOSE_FILE' 
 
       - name: Commit and Push Changes
         uses: actions/checkout@v4
