@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   result:
-    image: s/voting-apps-result-frontend:sha-ff008fes/voting-apps-result-frontend:{TAG:-latest}
+image: taufiq14s/voting-apps-result-frontend:sha-5259e55
     ports:
       - "8082:80"
     networks:
