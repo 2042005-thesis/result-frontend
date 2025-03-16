@@ -149,10 +149,10 @@ jobs:
           if [[ "git diff --cached --quiet" ]]; then
             echo "No changes to commit, skipping push."
             exit 0  # Exit gracefully instead of failing
-          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            git push origin main
           elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
             git push
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            git push origin main
           else
             echo "Branch not recognized, failed update."
             exit 1
