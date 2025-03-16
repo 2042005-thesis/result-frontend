@@ -113,6 +113,7 @@ jobs:
 
       - name: Update docker-compose.yml
         run: |
+          IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
@@ -128,12 +129,9 @@ jobs:
             echo "Error: $COMPOSE_FILE does not exist!"
             exit 1
           fi
-          
-          IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
           echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
           # Replace any existing tag in the docker-compose file
-          sed -i -E "s|(image:\s*)([^\s]+)|\1${IMAGE_TAG}|" "$COMPOSE_FILE"
-
+          sed -E -i.bak "s|image: \".*\"|image: \"$IMAGE_TAG\"|" "$COMPOSE_FILE"
       - name: Commit and Push Changes
         uses: actions/checkout@v4
         with:
