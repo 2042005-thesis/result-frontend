@@ -141,9 +141,9 @@ jobs:
           # Update docker image tag
           echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
           # Replace any existing tag in the docker-compose file
-          sed -E -i.bak "s|image: \".*\"|image: \"$DOCKER_METADATA_OUTPUT_TAGS\"|" "$COMPOSE_FILE"
+          sed -i.bak -E "s|(image:\s*)([^\s]+)|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
           # Stage changes
-          git add .
+          git add docker-compose.yml
           # Check if there are changes before committing
           if git diff --cached --quiet; then
             echo "No changes to commit, skipping push."
