@@ -37,9 +37,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Docker metadata 
-        id: meta-version-tag
-        uses: docker/metadata-action@v5
+      - name: Docker metadatadata 
+        id: metadata
+        uses: docker/metadatadata-action@v5
         with:
           # list of Docker images to use as base name for tags
           images: |
@@ -70,14 +70,14 @@ jobs:
         with:
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
 
       - name: Run Trivy vulnerability scanner on Docker image
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: ${{ steps.meta.outputs.tags }}
+          image-ref: ${{ steps.metadata.outputs.tags }}
           format: 'table'
           ignore-unfixed: true
           vuln-type: 'os,library'
@@ -89,5 +89,7 @@ jobs:
         with:
           push: true
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+
+      - name: Update doker-compose.yml
