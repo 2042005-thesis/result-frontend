@@ -101,8 +101,8 @@ jobs:
 
       - name: Update docker-compose.yml
         run: |
-          IMAGE_TAG=$(echo "${{ needs.metadata.outputs.tags }}" | cut -d ',' -f1)
-          IMAGE_NAME="${{ needs.metadata.outputs.images }}:$IMAGE_TAG"
+          IMAGE_TAG="${{ needs.metadata.outputs.tags }}"
+          IMAGE_NAME="${{ needs.metadata.outputs.images }}"
 
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
