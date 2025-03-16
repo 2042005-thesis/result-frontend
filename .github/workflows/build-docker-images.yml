@@ -1,4 +1,5 @@
 # Maintainers: taufiqpsumarna@gmail.com
+# Version: 1.0
 # Date: 2025-03-16
 
 name: Build and Push Docker Image
@@ -63,7 +64,7 @@ jobs:
         with:
           call: check
 
-      - name: Build docker keep image in local
+      - name: Build docker without push to registry
         uses: docker/build-push-action@v6
         with:
           push: false
@@ -132,6 +133,7 @@ jobs:
           echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
           # Replace any existing tag in the docker-compose file
           sed -E -i.bak "s|image: \".*\"|image: \"$IMAGE_TAG\"|" "$COMPOSE_FILE"
+
       - name: Commit and Push Changes
         uses: actions/checkout@v4
         with:
