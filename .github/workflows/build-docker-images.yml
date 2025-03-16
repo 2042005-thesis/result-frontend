@@ -44,7 +44,8 @@ jobs:
         id: metadata
         uses: docker/metadata-action@v5
         with:
-          images: taufiq14s/voting-apps-result-frontend
+          images: |
+            ${{ vars.DOCKER_REPO_NAME }}
           tags: |
             type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
             type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
@@ -131,7 +132,7 @@ jobs:
             echo "Error: $COMPOSE_FILE does not exist!"
             exit 1
           fi
-          echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
+          echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
           # Replace any existing tag in the docker-compose file
           sed -E -i.bak "s|image: \".*\"|image: \"$DOCKER_METADATA_OUTPUT_TAGS\"|" "$COMPOSE_FILE"
 
