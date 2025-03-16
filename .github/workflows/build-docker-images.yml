@@ -115,8 +115,11 @@ jobs:
             type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
             type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
 
-      - name: Update docker-compose.yml
-        run: |
+      - name: Update docker-compose.yml, Commit and Push Changes
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: |
           # Determine the correct docker-compose file to update
           if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             COMPOSE_FILE="env/staging/docker-compose.yml"
@@ -132,12 +135,7 @@ jobs:
             echo "Error: $COMPOSE_FILE does not exist!"
             exit 1
           fi
-
-      - name: Commit and Push Changes
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - run: |
+          # Config git credentials
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Update docker image tag
