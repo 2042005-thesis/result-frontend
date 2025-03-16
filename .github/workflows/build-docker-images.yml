@@ -79,7 +79,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'image'
-          image-ref: $(echo "${{ steps.metadata.outputs.tags }}" | cut -d ',' -f1)
+          image-ref: '${{ steps.metadata.outputs.images }}:${{ steps.metadata.outputs.tags }}'
           format: 'table'
           ignore-unfixed: true
           vuln-type: 'os,library'
