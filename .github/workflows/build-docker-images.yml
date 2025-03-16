@@ -92,6 +92,8 @@ jobs:
 
   update-docker-compose:
     name: Update Docker Compose Files
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     needs: build-scan-push
     if: contains('refs/heads/main refs/heads/staging', github.ref)
@@ -128,3 +130,15 @@ jobs:
             git commit -m "Update docker-compose with image: $IMAGE_TAG"
             git push
           fi
+      - name: Commit and Push Changes
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: |
+          date > generated.txt
+          # Note: the following account information will not work on GHES
+          git config user.name "github-actions[bot]"
+          git config user.email "{user.id}+{user.login}@users.noreply.github.com"
+          git add .
+          git commit -m "Update docker-compose with image: $IMAGE_TAG"
+          git push
