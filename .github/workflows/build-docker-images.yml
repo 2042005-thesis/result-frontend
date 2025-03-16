@@ -94,9 +94,6 @@ jobs:
           load: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-      - run: |
-          docker image tag ${{ steps.metadata.outputs.tags }} "${{ vars.DOCKER_REPO_NAME }}:latest"
-          docker image push "${{ vars.DOCKER_REPO_NAME }}:latest"
 
   update-docker-compose:
     name: Update Docker Compose Files
@@ -124,7 +121,7 @@ jobs:
       - name: Update docker-compose.yml, Commit and Push Changes
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}  # Checkout correct branch
       - run: |
           # Determine the correct docker-compose file to update
           if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
@@ -135,7 +132,6 @@ jobs:
             echo "Branch not recognized, skipping update."
             exit 0
           fi
-
           # Ensure file exists
           if [ ! -f "$COMPOSE_FILE" ]; then
             echo "Error: $COMPOSE_FILE does not exist!"
@@ -144,17 +140,21 @@ jobs:
           # Config git credentials
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
+          # Ensure we are on the correct branch
+          git checkout -B $BRANCH_NAME  # Creates the branch if missing
           # Update docker image tag
           echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
-          # Replace any existing tag in the docker-compose file
           sed -E -i "s|(image:\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
           # Stage changes
-          git add $COMPOSE_FILE
+          git add "$COMPOSE_FILE"
           # Check if there are changes before committing
           if git diff --cached --quiet; then
             echo "No changes to commit, skipping push."
-            exit 0  # Exit gracefully instead of failing
+            exit 0
           else
+            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
+            git push origin HEAD:$BRANCH_NAME
+          fi
             git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
             git push
           fi
