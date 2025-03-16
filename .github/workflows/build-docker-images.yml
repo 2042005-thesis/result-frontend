@@ -110,7 +110,7 @@ jobs:
             type=sha,format=short,enable=${{ github.ref == 'refs/heads/staging' }}
             type=semver,pattern={{version}},enable=${{ github.ref == 'refs/heads/main' }}
             type=semver,pattern={{major}}.{{minor}},enable=${{ github.ref == 'refs/heads/main' }}
-            
+
       - name: Update docker-compose.yml
         run: |
           IMAGE_TAG="${{ needs.metadata.outputs.tags }}"
@@ -145,5 +145,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           git add .
-          git commit -m "Update docker-compose with image: ${{ needs.metadata.outputs.images }}"
+          git commit -m "Update docker-compose with image: $IMAGE_TAG"
           git push
