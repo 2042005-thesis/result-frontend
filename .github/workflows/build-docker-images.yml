@@ -139,9 +139,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Update docker image tag
-          echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
+          echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_TAGS"
           # Replace any existing tag in the docker-compose file
-          sed -i -E "s|(image:\s*)([^\s]+)|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
+          sed -i -E "s|(image:\s*)([^\s]+)|\1$IMAGE_TAG|" "$COMPOSE_FILE"
           # Stage changes
           git add $COMPOSE_FILE
           # Check if there are changes before committing
