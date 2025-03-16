@@ -58,24 +58,37 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Scan Docker Image
-        run: |
-          IMAGE_TAG=$(echo "${{ steps.metadata.outputs.tags }}" | cut -d ',' -f1)
-          IMAGE_NAME="${{ steps.metadata.outputs.images }}:$IMAGE_TAG"
+      - name: Validate build configuration
+        uses: docker/build-push-action@v6
+        with:
+          call: check
 
-          echo "Building image: $IMAGE_NAME"
-          docker buildx build --load --tag "$IMAGE_NAME" .
+      - name: Build docker keep image in local
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          load: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
 
-          echo "Scanning image: $IMAGE_NAME"
-          trivy image --exit-code 1 --severity CRITICAL,HIGH --no-progress "$IMAGE_NAME"
+      - name: Run Trivy vulnerability scanner on Docker image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'image'
+          image-ref: '${{ steps.metadata.outputs.tags }}'
+          format: 'table'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          exit-code: 1
 
-      - name: Push Docker Image
-        run: |
-          IMAGE_TAG=$(echo "${{ steps.metadata.outputs.tags }}" | cut -d ',' -f1)
-          IMAGE_NAME="${{ steps.metadata.outputs.images }}:$IMAGE_TAG"
-
-          echo "Pushing image: $IMAGE_NAME"
-          docker buildx build --push --tag "$IMAGE_NAME" .
+      - name: Push docker images to registry
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          load: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
 
   update-docker-compose:
     name: Update Docker Compose Files
