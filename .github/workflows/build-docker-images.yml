@@ -129,8 +129,8 @@ jobs:
             exit 1
           fi
           
-          echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
           IMAGE_TAG="${{ steps.metadata.outputs.tags }}"
+          echo "Updating $COMPOSE_FILE with image: $IMAGE_TAG"
           # Replace any existing tag in the docker-compose file
           sed -i -E "s|(image:\s*)([^\s]+)|\1${IMAGE_TAG}|" "$COMPOSE_FILE"
 
@@ -142,8 +142,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           # Stage changes
-          git add "${COMPOSE_FILE}"
-
+          git add .
           # Check if there are changes before committing
           if git diff --cached --quiet; then
             echo "No changes to commit, skipping push."
