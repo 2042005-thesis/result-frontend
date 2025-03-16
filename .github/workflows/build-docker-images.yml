@@ -143,12 +143,17 @@ jobs:
 
           # Stage changes
           git add "$COMPOSE_FILE"
+          git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
 
           # Check if there are changes before committing
-          if git diff --cached --quiet; then
+          if [[ "git diff --cached --quiet" ]]; then
             echo "No changes to commit, skipping push."
             exit 0  # Exit gracefully instead of failing
-          else
-            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            git push origin main
+          elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
             git push
+          else
+            echo "Branch not recognized, failed update."
+            exit 1
           fi
