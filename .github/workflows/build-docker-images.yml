@@ -149,6 +149,6 @@ jobs:
             echo "No changes to commit, skipping push."
             exit 0  # Exit gracefully instead of failing
           else
-            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_TAGS"
+            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
             git push
           fi
