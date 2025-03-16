@@ -119,26 +119,13 @@ jobs:
           sed -i -E "s|($IMAGE_NAME:)[^ ]+|\1$IMAGE_TAG|g" "$COMPOSE_FILE"
 
       - name: Commit and Push Changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-          git add .
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update docker-compose with image: $IMAGE_TAG"
-            git push
-          fi
-      - name: Commit and Push Changes
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
       - run: |
-          date > generated.txt
           # Note: the following account information will not work on GHES
           git config user.name "github-actions[bot]"
           git config user.email "{user.id}+{user.login}@users.noreply.github.com"
           git add .
-          git commit -m "Update docker-compose with image: $IMAGE_TAG"
+          git commit -m "Update docker-compose with image: ${{ needs.metadata.outputs.images }}"
           git push
