@@ -68,6 +68,8 @@ jobs:
       - name: Build docker without push to registry
         uses: docker/build-push-action@v6
         with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: false
           load: true
           tags: ${{ steps.metadata.outputs.tags }}
