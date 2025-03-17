@@ -6,6 +6,15 @@ if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
   COMPOSE_FILE="env/staging/docker-compose.yml"
   BRANCH="staging"
 elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+  # Extract the version from the tag (e.g., v1.2.3)
+  VERSION_TAG="${GITHUB_REF#refs/tags/}"
+
+  # Check if the version matches semantic versioning (without "-pre" suffix)
+  if [[ ! "$VERSION_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Skipping update: Tag '$VERSION_TAG' is not a stable semantic version (without -pre)."
+    exit 0
+  fi
+
   COMPOSE_FILE="env/production/docker-compose.yml"
   BRANCH="main"
 
