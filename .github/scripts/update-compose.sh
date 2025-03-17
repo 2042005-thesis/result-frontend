@@ -1,9 +1,18 @@
 #!/bin/bash
+set -e  # Exit on error
+
 # Determine the correct docker-compose file to update
 if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
   COMPOSE_FILE="env/staging/docker-compose.yml"
+  BRANCH="staging"
 elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
   COMPOSE_FILE="env/production/docker-compose.yml"
+  BRANCH="main"
+
+  # Ensure we are on the main branch
+  git fetch origin main  # Fetch latest main branch
+  git checkout main || git checkout -b main origin/main  # Switch to main branch
+  git reset --hard origin/main  # Ensure branch is up to date
 else
   echo "Branch not recognized, skipping update."
   exit 0
@@ -19,17 +28,13 @@ sed -E -i "s|(image:\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
 
 # Stage changes
 git add "$COMPOSE_FILE"
-git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
 
 # Check if there are changes before committing
-if [[ "git diff --cached --quiet" ]]; then
+if git diff --cached --quiet; then
   echo "No changes to commit, skipping push."
   exit 0  # Exit gracefully instead of failing
-elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
-  git push
-elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-  git push origin main
-else
-  echo "Branch not recognized, failed update."
-  exit 1
 fi
+
+# Commit and push changes
+git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
+git push origin "$BRANCH"
