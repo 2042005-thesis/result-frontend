@@ -123,3 +123,8 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
       - run: .github/scripts/update-compose.sh
+
+      - name: Log Branch and Tag Info
+        run: |
+          echo "Running on branch/tag: $GITHUB_REF"
+          echo "Docker image tags: ${{ steps.metadata.outputs.tags }}"
