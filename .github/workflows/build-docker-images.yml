@@ -2,7 +2,7 @@
 # Version: 1.0
 # Date: 2025-03-16
 
-name: Build and Push Docker Image
+name: CI/CD Pipeline for Docker Images and Compose Files
 
 on:
   push:
