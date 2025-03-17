@@ -14,7 +14,7 @@ on:
 
 jobs:
   trivy-scan-fs:
-    name: Scan Repository for Vulnerabilities
+    name: 🛡️ Scan Repository for Vulnerabilities
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
           exit-code: 1
 
   build-scan-push:
-    name: Build, Scan & Push Docker Image
+    name: 🐳 Build, Scan & Push Docker Image
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/staging'
     steps:
@@ -94,12 +94,9 @@ jobs:
           load: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-      - run: |
-          docker image tag ${{ steps.metadata.outputs.tags }} "${{ vars.DOCKER_REPO_NAME }}:latest"
-          docker image push "${{ vars.DOCKER_REPO_NAME }}:latest"
 
   update-docker-compose:
-    name: Update Docker Compose Files
+    name: 📝 Update Docker Compose Files
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -125,36 +122,4 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-      - run: |
-          # Determine the correct docker-compose file to update
-          if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
-            COMPOSE_FILE="env/staging/docker-compose.yml"
-          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            COMPOSE_FILE="env/production/docker-compose.yml"
-          else
-            echo "Branch not recognized, skipping update."
-            exit 0
-          fi
-
-          # Ensure file exists
-          if [ ! -f "$COMPOSE_FILE" ]; then
-            echo "Error: $COMPOSE_FILE does not exist!"
-            exit 1
-          fi
-          # Config git credentials
-          git config user.name "github-actions[bot]"
-          git config user.email "{user.id}+{user.login}@users.noreply.github.com"
-          # Update docker image tag
-          echo "Updating $COMPOSE_FILE with image: $DOCKER_METADATA_OUTPUT_VERSION"
-          # Replace any existing tag in the docker-compose file
-          sed -E -i "s|(image:\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
-          # Stage changes
-          git add $COMPOSE_FILE
-          # Check if there are changes before committing
-          if git diff --cached --quiet; then
-            echo "No changes to commit, skipping push."
-            exit 0  # Exit gracefully instead of failing
-          else
-            git commit -m "Update image tag $DOCKER_METADATA_OUTPUT_VERSION"
-            git push
-          fi
+      - run: .github/scripts/update-compose.sh
