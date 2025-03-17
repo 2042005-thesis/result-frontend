@@ -14,7 +14,7 @@ on:
 
 jobs:
   trivy-scan-fs:
-    name: Scan Repository for Vulnerabilities
+    name: 🛡️ Scan Repository for Vulnerabilities
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
           exit-code: 1
 
   build-scan-push:
-    name: Build, Scan & Push Docker Image
+    name: 🐳 Build, Scan & Push Docker Image
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/staging'
     steps:
@@ -96,7 +96,7 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
 
   update-docker-compose:
-    name: Update Docker Compose Files
+    name: 📝 Update Docker Compose Files
     permissions:
       contents: write
     runs-on: ubuntu-latest
