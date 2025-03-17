@@ -2,11 +2,12 @@
 # Version: 1.0
 # Date: 2025-03-16
 
-name: Build and Push Docker Image
+name: CI/CD Pipeline for Docker Images and Compose Files
 
 on:
   push:
     branches:
+    - main
     - staging
     - dev*
     tags: [ v* ]
@@ -17,10 +18,14 @@ jobs:
     name: 🛡️ Scan Repository for Vulnerabilities
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Run Trivy vulnerability scanner in repo mode
+      - name: Log Branch and Tag Info
+        run: |
+          echo "Running vulnerability scan on: $GITHUB_REF"
+
+      - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: 'fs'
