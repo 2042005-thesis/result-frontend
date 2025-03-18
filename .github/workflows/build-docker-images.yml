@@ -14,22 +14,17 @@ on:
   pull_request:
 
 jobs:
-  gitguardian-scan:
-    name: 🔑 GitGuardian scan
+  trufflehog-scan:
+    name: 🔑 TruffleHog Secrets Scan
     runs-on: ubuntu-latest
-    container:
-      image: gitguardian/ggshield:latest
     permissions:
       contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        
-      - name: Mark Repository as Safe
-        run: git config --global --add safe.directory $(pwd)
 
-      - name: Run GitGuardian Scanner (Offline Mode)
-        run: ggshield secret scan ci --all-secrets --with-incident-detail
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.88.17
 
   trivy-scan-fs:
     name: 🛡️ Scan Repository for Vulnerabilities
