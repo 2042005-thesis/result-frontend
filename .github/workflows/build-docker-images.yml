@@ -24,6 +24,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        
+      - name: Mark Repository as Safe
+        run: git config --global --add safe.directory $(pwd)
 
       - name: Run GitGuardian Scanner (Offline Mode)
         run: ggshield secret scan ci --all-secrets --with-incident-detail
