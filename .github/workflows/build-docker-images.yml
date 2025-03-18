@@ -28,7 +28,7 @@ jobs:
       - name: Run TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
         with:
-          extra_args: --github-actions --results=verified,unknown
+          extra_args: --results=verified,unknown
 
   trivy-scan-fs:
     name: 🛡️ Scan Repository for Vulnerabilities
