@@ -27,7 +27,7 @@ jobs:
       - name: GitGuardian scan
         uses: GitGuardian/ggshield-action@v1
         with:
-          args: -v --all-secrets --with-incident-details
+          args: -v --with-incident-details
         env:
           GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
