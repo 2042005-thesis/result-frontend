@@ -41,7 +41,7 @@ fi
 # Clone the deployment repository
 if [[ -n "${DEPLOYMENT_REPO:-}" ]]; then
   log "Cloning deployment repo..."
-  git clone "https://$DEPLOYMENT_TOKEN:$DEPLOYMENT_REPO" deployment
+  git clone "https://$DEPLOYMENT_TOKEN@$DEPLOYMENT_REPO" deployment
   cd deployment
   git fetch origin dev
   git checkout dev || git checkout -b dev "origin/dev"
