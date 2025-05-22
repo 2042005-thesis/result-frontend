@@ -132,7 +132,7 @@ jobs:
     env:
       IMAGE_NAME: ${{ vars.DOCKER_REPO_NAME }}
       DEPLOYMENT_REPO: ${{ vars.DEPLOYMET_REPO }}
-      DEPLOYMENT_TOKEN: ${{ vars.DEPLOYMENT_TOKEN }}
+      DEPLOYMENT_TOKEN: ${{ secrets.DEPLOYMENT_TOKEN }}
       DEPLOYMENT_APP_PATH: ${{ vars.DEPLOYMENT_APP_PATH }}
       DEPLOYMENT_REPOSITORY: ${{ vars.DEPLOYMENT_REPOSITORY }}
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/staging'
