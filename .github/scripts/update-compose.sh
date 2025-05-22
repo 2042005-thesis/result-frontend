@@ -53,7 +53,7 @@ if [[ "$ALLOW_UPDATE" == true ]]; then
   log "Updating $COMPOSE_FILE with image tag: $DOCKER_METADATA_OUTPUT_TAGS"
 
   # Replace image tag
-  sed -E -i "s|(image: $DEPLOYMENT_IMAGE_NAME\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
+  sed -E -i "s|(image: $DOCKER_REPO_NAME\s*)[^ ]+|\1$DOCKER_METADATA_OUTPUT_TAGS|" "$COMPOSE_FILE"
 
   git config user.name "github-actions[bot]"
   git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -66,8 +66,8 @@ if [[ "$ALLOW_UPDATE" == true ]]; then
   fi
 
   git commit -m "Update image tag to $DOCKER_METADATA_OUTPUT_TAGS"
-  git push origin "$BRANCH"
-  log "Changes pushed to $BRANCH."
+  git push origin dev
+  log "Changes pushed to dev."
 else
   log "Skipping update: ALLOW_UPDATE is not set to true."
   exit 0
