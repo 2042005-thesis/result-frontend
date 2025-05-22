@@ -6,6 +6,7 @@ if [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
   COMPOSE_FILE="apps/dev/docker-compose.yml"
   BRANCH="dev"
   ALLOW_UPDATE=true  # Always allow updates for dev (Git SHA)
+fi
 
 if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
   COMPOSE_FILE="apps/staging/docker-compose.yml"
@@ -29,7 +30,7 @@ elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
 
   # Ensure we are on the main branch
   # Clonning deployment repository
-  git clone $DEPLOYMET_REPO
+  git clone "$DEPLOYMET_REPO"
   git fetch origin dev  # Fetch latest main branch
   git checkout dev || git checkout -b dev origin/dev  # Switch to main branch
   git reset --hard origin/dev  # Ensure branch is up to date
