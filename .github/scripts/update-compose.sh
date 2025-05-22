@@ -56,7 +56,7 @@ if [[ "$ALLOW_UPDATE" == true ]]; then
   log "Updating $COMPOSE_FILE with image tag: $DOCKER_METADATA_OUTPUT_TAGS"
 
   # Replace image tag
-  sed -E -i "s|(image:\s*$DOCKER_REPO_NAME):[a-zA-Z0-9._-]+|\1:$DOCKER_METADATA_OUTPUT_VERSION|" "$COMPOSE_FILE"
+  sed -E -i "s|(image:\s*$IMAGE_NAME):[a-zA-Z0-9._-]+|\1:$DOCKER_METADATA_OUTPUT_VERSION|" "$COMPOSE_FILE"
 
   git config user.name "github-actions[bot]"
   git config user.email "github-actions[bot]@users.noreply.github.com"
