@@ -8,7 +8,8 @@ if [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
   ALLOW_UPDATE=true  # Always allow updates for dev (Git SHA)
 fi
 
-if [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+  # Allow update only if it's a stable semantic version (vX.Y.Z-pre)
+if [[ "$VERSION_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-pre$ ]]; then
   COMPOSE_FILE="apps/staging/docker-compose.yml"
   BRANCH="staging"
 
