@@ -8,6 +8,7 @@ log() {
 
 # Initialize VERSION_TAG to avoid "unbound variable" errors
 VERSION_TAG=""
+DEPLOYMENT_REPO= ${{ vars.DEPLOYMENT_REPO }}
 
 # Extract version tag if it's a tag reference
 if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
