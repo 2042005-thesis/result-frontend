@@ -6,6 +6,9 @@ log() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
 }
 
+# Initialize VERSION_TAG to avoid "unbound variable" errors
+VERSION_TAG=""
+
 # Extract version tag if it's a tag reference
 if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
   VERSION_TAG="${GITHUB_REF#refs/tags/}"
