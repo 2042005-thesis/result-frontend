@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Stage 2: Production
-FROM node:22.14.0-alpine3.21
+FROM node:22.14.0-alpine3.21 
 WORKDIR /usr/local/app
 COPY --from=builder /usr/local/app/node_modules /node_modules
 COPY . .
